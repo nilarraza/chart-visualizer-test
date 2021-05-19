@@ -1,8 +1,6 @@
 package com.eitech1.chartv.service.impl;
 
-import java.net.SocketException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +53,7 @@ public class ExcelServiceImpl implements ExcelService{
 	private ExcelValidation excelValidation;
 	
 	//private String excelPath =".\\src\\main\\resources\\";
-	private String excelPath ="./src/main/resources/";
+	//private String excelPath ="./src/main/resources/";
 	
 	
 
@@ -64,13 +62,15 @@ public class ExcelServiceImpl implements ExcelService{
 		
 		try {
 			excelValidation.validateSheetName(multipartFile.getOriginalFilename());
-		String filepath = excelPath + multipartFile.getOriginalFilename();
+	//	String filepath = excelPath + multipartFile.getOriginalFilename();
 		
-		 byte[]	bytes = multipartFile.getBytes();
-			java.nio.file.Path path = Paths.get(excelPath + multipartFile.getOriginalFilename());
-			Files.write(path, bytes);
+		// byte[]	bytes = multipartFile.getBytes();
+		//	java.nio.file.Path path = Paths.get(excelPath + multipartFile.getOriginalFilename());
+		//	Files.write(path, bytes);
 		
-		Workbook workbook=excelUtil.getExcel(filepath);
+			InputStream is=multipartFile.getInputStream();
+			
+		Workbook workbook=excelUtil.getExcel(is);
 		int x = workbook.getNumberOfSheets();
 		
 		List<Tab> tabList=new ArrayList<Tab>();//tab list to set with sheetEx
@@ -169,9 +169,7 @@ public class ExcelServiceImpl implements ExcelService{
 
 		} catch (ChartVException e) {
 			throw e;
-		}catch (SocketException e) {
-				throw new ChartVException("tested socket", e);
-			}catch (Exception e) {
+		}catch (Exception e) {
 
 			if(e instanceof org.springframework.dao.DataIntegrityViolationException && e.getCause() instanceof org.hibernate.exception.ConstraintViolationException) {
 				org.hibernate.exception.ConstraintViolationException hibernateException = (ConstraintViolationException) e.getCause();
@@ -179,7 +177,7 @@ public class ExcelServiceImpl implements ExcelService{
 				
 			}
 
-			throw new ChartVException(ResponseMessages.UNEXPECTED_ERROR, e);
+			throw new ChartVException(ResponseMessages.UNEXPECTED_ERROR, e.getCause());
 			//throw new ChartVException(e);  
 		}
 		

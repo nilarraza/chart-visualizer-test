@@ -1,6 +1,7 @@
 package com.eitech1.chartv.util;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,29 +19,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 public class ExcelUtil {
 
-	public Workbook getExcel(String excelPath) throws ChartVException {
+	public Workbook getExcel(InputStream input) throws ChartVException {
 
 		// Creating a Workbook from an Excel file (.xls or .xlsx)
 		Workbook workbook;
 		try {
-			workbook = WorkbookFactory.create(new File(excelPath));
+			//workbook = WorkbookFactory.create(new File(excelPath));
+			workbook = WorkbookFactory.create(input);
 		} catch (EncryptedDocumentException e) {
 			throw new ChartVException(ResponseMessages.ENCRYPTED_FILE, e.getCause());
 		} catch (InvalidFormatException e) {
 			throw new ChartVException(ResponseMessages.INCORRECT_FILE_FORMAT, e.getCause());
 		} catch (Exception e) {
-			//throw new ChartVException(ResponseMessages.UNEXPECTED_ERROR, e.getCause());
-			throw new ChartVException("this is the error",e.getCause());
+			throw new ChartVException(ResponseMessages.UNEXPECTED_ERROR, e.getCause());
+			//throw new ChartVException("this is the error",e.getCause());
 		}
-//				
-//		// Retrieving the number of sheets in the Workbook
-//		System.out.println("Workbook has " + workbook.getNumberOfSheets() + " Sheets : ");
-//
-//		//Retrieving Sheets using for-each loop
-//		for (Sheet sheet : workbook) {
-//			System.out.println("=> " + sheet.getSheetName());
-//		}
-//		
+	
 		return workbook;
 	}
 
