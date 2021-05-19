@@ -180,7 +180,7 @@ public class ExcelServiceImpl implements ExcelService{
 			}
 
 			//throw new ChartVException(ResponseMessages.UNEXPECTED_ERROR, e);
-			throw new ChartVException(e);
+			throw new ChartVException(e);  
 		}
 		
 		

@@ -49,7 +49,6 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 		//Log.error(LOG_MESSAGE, ex);
 		String message = ex.getMessage();
 		//String message = ex.getCause().getMessage();
-		
 		if(message == null && ex.getCause() != null) {
 			message = ex.getCause().getMessage();
 		}
