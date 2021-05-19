@@ -49,5 +49,5 @@ jobs:
       with:
         app-name: 'chart-visualizer'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_dbacf54176954df2838a9042740a1594 }}
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_07a74788c76248ab909b5678200bb596 }}
         package: '*.jar'
