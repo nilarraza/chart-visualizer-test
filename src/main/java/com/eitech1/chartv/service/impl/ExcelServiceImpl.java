@@ -54,8 +54,8 @@ public class ExcelServiceImpl implements ExcelService{
 	@Autowired
 	private ExcelValidation excelValidation;
 	
-	private String excelPath =".\\src\\main\\resources\\";
-	//private String excelPath ="./src/main/resources/";
+	//private String excelPath =".\\src\\main\\resources\\";
+	private String excelPath ="./src/main/resources/";
 	
 	
 
