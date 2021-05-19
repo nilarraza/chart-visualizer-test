@@ -177,8 +177,8 @@ public class ExcelServiceImpl implements ExcelService{
 				
 			}
 
-			throw new ChartVException(ResponseMessages.UNEXPECTED_ERROR, e.getCause());
-			//throw new ChartVException(e);  
+			//throw new ChartVException(ResponseMessages.UNEXPECTED_ERROR, e.getCause());
+			throw new ChartVException(e);  
 		}
 		
 		
