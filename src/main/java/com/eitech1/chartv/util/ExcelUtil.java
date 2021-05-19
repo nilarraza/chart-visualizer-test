@@ -30,7 +30,7 @@ public class ExcelUtil {
 			throw new ChartVException(ResponseMessages.INCORRECT_FILE_FORMAT, e.getCause());
 		} catch (Exception e) {
 			//throw new ChartVException(ResponseMessages.UNEXPECTED_ERROR, e.getCause());
-			throw new ChartVException(e.getCause());
+			throw new ChartVException("this is the error",e.getCause());
 		}
 //				
 //		// Retrieving the number of sheets in the Workbook
