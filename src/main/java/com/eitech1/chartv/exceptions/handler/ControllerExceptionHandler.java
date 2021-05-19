@@ -22,7 +22,7 @@ import com.eitech1.chartv.response.template.Response;
 public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 	
 	//private static Logger Log = AppLogger.getLogger();
-	private static final String LOG_MESSAGE = "Exception caught and handled.";
+	//private static final String LOG_MESSAGE = "Exception caught and handled.";
 	
 	@ExceptionHandler({ ChartVPersistenceException.class })
 	public ResponseEntity<Response<Object>> handleChartVPersistenceException(ChartVPersistenceException ex) {
