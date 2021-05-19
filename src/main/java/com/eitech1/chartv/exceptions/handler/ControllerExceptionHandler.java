@@ -47,7 +47,9 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler({ ChartVException.class })
 	public ResponseEntity<Response<Object>> handlChartVException(ChartVException ex) {
 		//Log.error(LOG_MESSAGE, ex);
-		String message = ex.getMessage();
+		//String message = ex.getMessage();
+		String message = ex.getCause().getMessage();
+		
 		if(message == null && ex.getCause() != null) {
 			message = ex.getCause().getMessage();
 		}
