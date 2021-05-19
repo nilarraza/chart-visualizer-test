@@ -1,5 +1,6 @@
 package com.eitech1.chartv.service.impl;
 
+import java.net.SocketException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -167,7 +168,9 @@ public class ExcelServiceImpl implements ExcelService{
 
 		} catch (ChartVException e) {
 			throw e;
-		} catch (Exception e) {
+		}catch (SocketException e) {
+				throw new ChartVException("tested socket", e);
+			}catch (Exception e) {
 
 			if(e instanceof org.springframework.dao.DataIntegrityViolationException && e.getCause() instanceof org.hibernate.exception.ConstraintViolationException) {
 				org.hibernate.exception.ConstraintViolationException hibernateException = (ConstraintViolationException) e.getCause();
@@ -176,7 +179,7 @@ public class ExcelServiceImpl implements ExcelService{
 			}
 
 			//throw new ChartVException(ResponseMessages.UNEXPECTED_ERROR, e);
-			throw new ChartVException(e);
+			throw new ChartVException("test exp",e);
 		}
 		
 		
