@@ -28,10 +28,12 @@ import com.eitech1.chartv.response.dto.SheetExDto;
 import com.eitech1.chartv.response.dto.TabDto;
 import com.eitech1.chartv.response.template.Response;
 import com.eitech1.chartv.respository.SheetExRepository;
+import com.eitech1.chartv.respository.SheetMetaRepository;
 import com.eitech1.chartv.service.ExcelService;
 import com.eitech1.chartv.service.util.DtoToEntityMapper;
 import com.eitech1.chartv.service.util.EntityToDtoMapper;
 import com.eitech1.chartv.util.ExcelUtil;
+import com.eitech1.chartv.validator.CommonValidation;
 import com.eitech1.chartv.validator.ExcelValidation;
 
 @Service
@@ -51,6 +53,12 @@ public class ExcelServiceImpl implements ExcelService {
 
 	@Autowired
 	private ExcelValidation excelValidation;
+
+	@Autowired
+	private CommonValidation commonValidation;
+
+	@Autowired
+	private SheetMetaRepository sheetMetaRepository;
 
 	@Override
 	public ResponseEntity<Response<SheetExDto>> readExcel(MultipartFile multipartFile) throws ChartVException {
@@ -87,7 +95,6 @@ public class ExcelServiceImpl implements ExcelService {
 				// Create a DataFormatter to format and get each cell's value as String
 				DataFormatter dataFormatter = new DataFormatter();
 
-			
 				// 2. Or you can use a for-each loop to iterate over the rows and columns
 				for (Row row : sheetTab) {
 
@@ -103,10 +110,10 @@ public class ExcelServiceImpl implements ExcelService {
 						if (row.getRowNum() == 1) {
 							header = dataFormatter.formatCellValue(cell);
 							headerList.add(header);
-							//System.out.println(header);
+							// System.out.println(header);
 						} else {
 							String cellValue = dataFormatter.formatCellValue(cell);
-							//System.out.print(cellValue + "\t");
+							// System.out.print(cellValue + "\t");
 							rowValueList.add(cellValue);
 						}
 
@@ -154,15 +161,56 @@ public class ExcelServiceImpl implements ExcelService {
 
 			if (e instanceof org.springframework.dao.DataIntegrityViolationException
 					&& e.getCause() instanceof org.hibernate.exception.ConstraintViolationException) {
-				
-				org.hibernate.exception.ConstraintViolationException hibernateException = (ConstraintViolationException) e.getCause();
-				
-				throw new ChartVPersistenceException(hibernateException.getCause().getLocalizedMessage(),hibernateException.getCause());
+
+				org.hibernate.exception.ConstraintViolationException hibernateException = (ConstraintViolationException) e
+						.getCause();
+
+				throw new ChartVPersistenceException(hibernateException.getCause().getLocalizedMessage(),
+						hibernateException.getCause());
 
 			}
 
 			throw new ChartVException(ResponseMessages.UNEXPECTED_ERROR, e.getCause());
 			// throw new ChartVException(e);
+		}
+
+	}
+
+	@Override
+	public ResponseEntity<Response<List<SheetExDto>>> getExcel(int typeId) throws ChartVException {
+		try {
+			commonValidation.validateSheetMeta(typeId);
+
+			List<SheetExDto> sheetList = new ArrayList<SheetExDto>();
+
+			List<SheetEx> sheetResponse = sheetExRepository.findBySheetMeta(sheetMetaRepository.getOne(typeId));
+
+			// Build response
+			for (SheetEx sheetEx : sheetResponse) {
+
+				List<TabDto> tabDtoList = new ArrayList<TabDto>();
+				for (Tab tab : sheetEx.getTabs()) {
+					List<DataSetDto> datasetDtoList = new ArrayList<DataSetDto>();
+
+					for (DataSet dataset : tab.getData()) {
+						datasetDtoList.add(entityToDtoMapper.convertToDataSetDto(dataset));
+					}
+
+					TabDto tabDto = entityToDtoMapper.convertToTabDto(tab, datasetDtoList);
+					tabDtoList.add(tabDto);
+				}
+
+				SheetExDto responseSheet = entityToDtoMapper.converToSheetExDto(sheetEx, tabDtoList);
+				sheetList.add(responseSheet);
+			}
+
+			return Response.success(sheetList, HttpStatus.OK);
+
+		}catch (ChartVException e) {
+			throw e; 
+		}catch (Exception e) {
+			System.out.println(e);
+			throw new ChartVException(ResponseMessages.UNEXPECTED_ERROR, e.getCause());
 		}
 
 	}
