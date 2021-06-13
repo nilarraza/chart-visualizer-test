@@ -37,10 +37,10 @@ public class ExcelController {
 	@Autowired
 	private ExcelService excelService;
 	
-	@PostMapping(value="/upload",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value="/upload/{type_id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ApiOperation("upload the excel sheet to read and save data")
-	public ResponseEntity<Response<SheetExDto>> uploadData(@RequestPart("file") MultipartFile multipartFile) throws EncryptedDocumentException, InvalidFormatException, IOException, ChartVException {
-		return excelService.readExcel(multipartFile);	
+	public ResponseEntity<Response<SheetExDto>> uploadData(@RequestPart("file") MultipartFile multipartFile,@PathVariable("type_id") int excelTypeId) throws EncryptedDocumentException, InvalidFormatException, IOException, ChartVException {
+		return excelService.readExcel(multipartFile,excelTypeId);	
 	}
 	
 	@GetMapping(value="/sheet/{type_id}")

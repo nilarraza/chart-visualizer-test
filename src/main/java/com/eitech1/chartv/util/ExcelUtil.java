@@ -42,7 +42,14 @@ public class ExcelUtil {
 
 		int i = 0;
 		for (String cellvalue : excelData) {
-			map.put(headerList.get(i),(double) Math.round(Double.parseDouble(cellvalue)));
+			if(cellvalue.equals("-") == true) {
+				map.put(headerList.get(i),(double) Math.round(Double.parseDouble("0")));
+			}
+			else{
+				System.out.println(cellvalue);
+				
+				map.put(headerList.get(i),(double) Math.round(Double.parseDouble(cellvalue)));
+			}
 			i++;
 		}
 

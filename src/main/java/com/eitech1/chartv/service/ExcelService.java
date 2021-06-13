@@ -15,6 +15,6 @@ import com.eitech1.chartv.response.template.Response;
 
 public interface ExcelService {
 	
-	ResponseEntity<Response<SheetExDto>> readExcel(MultipartFile multipartFile) throws EncryptedDocumentException, InvalidFormatException, IOException, ChartVException;
+	ResponseEntity<Response<SheetExDto>> readExcel(MultipartFile multipartFile,int excelTypeId) throws EncryptedDocumentException, InvalidFormatException, IOException, ChartVException;
 	ResponseEntity<Response<List<SheetExDto>>> getExcel(int typeId) throws ChartVException;
 }

@@ -61,10 +61,11 @@ public class ExcelServiceImpl implements ExcelService {
 	private SheetMetaRepository sheetMetaRepository;
 
 	@Override
-	public ResponseEntity<Response<SheetExDto>> readExcel(MultipartFile multipartFile) throws ChartVException {
+	public ResponseEntity<Response<SheetExDto>> readExcel(MultipartFile multipartFile,int excelTypeId) throws ChartVException {
 
 		try {
-			excelValidation.validateSheetName(multipartFile.getOriginalFilename());
+			commonValidation.validateSheetMeta(excelTypeId);
+			excelValidation.validateSheetName(multipartFile.getOriginalFilename(),excelTypeId);
 
 			InputStream is = multipartFile.getInputStream();
 
@@ -74,7 +75,7 @@ public class ExcelServiceImpl implements ExcelService {
 			List<Tab> tabList = new ArrayList<Tab>();// tab list to set with sheetEx
 
 			// dto to entity mapping (Sheet)
-			SheetEx sheetEx = dtoDtoToEntityMapper.converToSheet();
+			SheetEx sheetEx = dtoDtoToEntityMapper.converToSheet(excelTypeId);
 
 			// Getting the Sheet at index zero
 			long start = System.currentTimeMillis();
@@ -113,14 +114,16 @@ public class ExcelServiceImpl implements ExcelService {
 							// System.out.println(header);
 						} else {
 							String cellValue = dataFormatter.formatCellValue(cell);
-							// System.out.print(cellValue + "\t");
+							 System.out.print(cellValue + "\t");
 							rowValueList.add(cellValue);
 						}
 
 					}
 					System.out.println();
 					if (row.getRowNum() != 0 && row.getRowNum() != 1) {
+						System.out.println(rowValueList);
 						excelValidation.validateColumn(headerList, rowValueList);
+						System.out.println(tabTopic);
 						jsonData = excelUtil.createRowJson(rowValueList, headerList);
 						DataSet dataSet = dtoDtoToEntityMapper.convertToDataSet(jsonData, tab);
 						dataSetList.add(dataSet);

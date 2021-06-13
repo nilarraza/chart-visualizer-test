@@ -30,10 +30,10 @@ public class DtoToEntityMapper {
 				.sheet(sheet)
 				.build();
 	}
-	public SheetEx converToSheet() {
+	public SheetEx converToSheet(int id) {
 		return SheetEx.builder()
 				.uploadedDate(new Date())
-				.sheetMeta(sheetMetaRepository.getOne(1))
+				.sheetMeta(sheetMetaRepository.getOne(id))
 				.build();
 		
 	}
