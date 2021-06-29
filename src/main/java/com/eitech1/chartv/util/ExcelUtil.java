@@ -38,18 +38,24 @@ public class ExcelUtil {
 
 	public String createRowJson(List<String> excelData, List<String> headerList) throws ChartVException {
 
-		HashMap<String, Double> map = new HashMap<String, Double>();
+		//HashMap<String, Double> map = new HashMap<String, Double>();
+		HashMap<String, Object> map = new HashMap<String, Object>();
 
 		int i = 0;
 		for (String cellvalue : excelData) {
-			if(cellvalue.equals("-") == true) {
-				map.put(headerList.get(i),(double) Math.round(Double.parseDouble("0")));
-			}
-			else{
-				System.out.println(cellvalue);
+//			if(cellvalue.equals("-") == true) {//|| cellvalue.contains(" ")
+//				map.put(headerList.get(i),(double) Math.round(Double.parseDouble("0")));
+//			}
+//			else{
+				if(i==0) {
+					map.put(headerList.get(i),cellvalue);
+				}else if(cellvalue.equals("-") == true || cellvalue.contains(" ")) {
+					map.put(headerList.get(i),(double) Math.round(Double.parseDouble("0")));	
+				}else {
+					map.put(headerList.get(i),(double) Math.round(Double.parseDouble(cellvalue)));
+				}
 				
-				map.put(headerList.get(i),(double) Math.round(Double.parseDouble(cellvalue)));
-			}
+//			}
 			i++;
 		}
 
@@ -59,7 +65,7 @@ public class ExcelUtil {
 		} catch (JsonProcessingException e) {
 			throw new ChartVException(e.getCause());
 		}
-		System.out.println(json);
+	//	System.out.println(json);
 
 		return json;
 	}

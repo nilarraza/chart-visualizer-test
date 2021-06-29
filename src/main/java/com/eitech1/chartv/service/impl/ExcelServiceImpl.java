@@ -106,6 +106,7 @@ public class ExcelServiceImpl implements ExcelService {
 
 						if (row.getRowNum() == 0) {
 							tabTopic = dataFormatter.formatCellValue(cell);
+							System.out.println(tabTopic);
 						}
 
 						if (row.getRowNum() == 1) {
@@ -114,14 +115,18 @@ public class ExcelServiceImpl implements ExcelService {
 							// System.out.println(header);
 						} else {
 							String cellValue = dataFormatter.formatCellValue(cell);
-							 System.out.print(cellValue + "\t");
+							if(cellValue.isBlank()) {
+								cellValue="-";
+								//System.out.println("-");
+							}
+							// System.out.print(cellValue + "\t");
 							rowValueList.add(cellValue);
 						}
 
 					}
 					System.out.println();
 					if (row.getRowNum() != 0 && row.getRowNum() != 1) {
-						System.out.println(rowValueList);
+				//			System.out.println(rowValueList);			
 						excelValidation.validateColumn(headerList, rowValueList);
 						System.out.println(tabTopic);
 						jsonData = excelUtil.createRowJson(rowValueList, headerList);
