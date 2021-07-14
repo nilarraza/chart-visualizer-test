@@ -17,24 +17,22 @@ import com.eitech1.chartv.service.MetaService;
 import io.swagger.annotations.ApiOperation;
 
 
-
 /**
  * @author Nilar
- *
  */
 @RestController
 @RequestMapping("/meta")
 @CrossOrigin(origins = "*")
 public class MetaController {
-	@Autowired
-	private MetaService metaService;
-	
-	
-	@GetMapping("/sheet")
-	@ApiOperation("get all master sheet details")
-	public ResponseEntity<Response<List<SheetMetaDto>>> getAllSheetMetas() throws ChartVException{
-		return metaService.getAllSheetMeta();
-		
-	}
+    @Autowired
+    private MetaService metaService;
+
+
+    @GetMapping("/sheet")
+    @ApiOperation("get all master sheet details")
+    public ResponseEntity<Response<List<SheetMetaDto>>> getAllSheetMetas() throws ChartVException {
+        return metaService.getAllSheetMeta();
+
+    }
 
 }
