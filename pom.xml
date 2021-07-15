@@ -105,6 +105,7 @@
 			</plugin>
 
 		</plugins>
+		<finalName>chart-visualizer</finalName>
 	</build>
 
 </project>
