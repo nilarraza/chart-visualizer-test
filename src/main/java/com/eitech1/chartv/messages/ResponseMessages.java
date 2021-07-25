@@ -5,5 +5,7 @@ public class ResponseMessages {
 	public static final String ENCRYPTED_FILE = "The uploaded file is encrypted";
 	public static final String INCORRECT_FILE_FORMAT = "The uploaded file format is incorrect";
 	public static final String UNEXPECTED_ERROR = "Unexpected error occured";
+	
+	public static final String USERNAME_PASSWORD = "Incorrect username or password";
 
 }

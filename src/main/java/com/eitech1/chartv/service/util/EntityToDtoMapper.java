@@ -8,10 +8,12 @@ import com.eitech1.chartv.Entity.DataSet;
 import com.eitech1.chartv.Entity.SheetEx;
 import com.eitech1.chartv.Entity.SheetMeta;
 import com.eitech1.chartv.Entity.Tab;
+import com.eitech1.chartv.Entity.User;
 import com.eitech1.chartv.response.dto.DataSetDto;
 import com.eitech1.chartv.response.dto.SheetExDto;
 import com.eitech1.chartv.response.dto.SheetMetaDto;
 import com.eitech1.chartv.response.dto.TabDto;
+import com.eitech1.chartv.response.dto.UserDto;
 
 @Component
 public class EntityToDtoMapper {
@@ -55,4 +57,23 @@ public class EntityToDtoMapper {
 			
 	}
 
+//	public UserDto convertUserDto(User user) {
+//		return UserDto.builder()
+//				.userid(user.getUserid())
+//				.email(user.getEmail())
+//				.username(user.getUsername())
+//				.role(user.getRole())
+//				.build();
+//	}
+//	
+	public UserDto convertUserDto(User user) {
+		return UserDto.builder()
+				.userid(user.getUserid())
+				.username(user.getUsername())
+				.password(user.getPassword())
+				.roles(user.getRoles())
+				.email(user.getEmail())
+				.build();
+	}
+	
 }
