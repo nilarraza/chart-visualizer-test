@@ -73,6 +73,7 @@ public class EntityToDtoMapper {
 				.password(user.getPassword())
 				.roles(user.getRoles())
 				.email(user.getEmail())
+				.isActive(user.isActive())
 				.build();
 	}
 	

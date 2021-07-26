@@ -35,4 +35,11 @@ public class UserValidation {
 			throw new ChartVDataValidationException("Username Not Found", username);
 		}
 	}
+	
+	public void validateUserById(int id)throws ChartVException {
+		boolean valid = userRepository.existsById(id);
+		if (!valid) {
+			throw new ChartVDataValidationException("User not found for this id", id);
+		}
+	}
 }

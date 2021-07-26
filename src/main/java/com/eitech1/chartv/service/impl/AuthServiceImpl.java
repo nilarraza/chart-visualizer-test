@@ -14,7 +14,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import com.eitech1.chartv.Entity.ResetToken;
 import com.eitech1.chartv.Entity.User;
 import com.eitech1.chartv.exceptions.ChartVException;
 import com.eitech1.chartv.exceptions.ChartVPersistenceException;
@@ -25,7 +24,6 @@ import com.eitech1.chartv.request.dto.UserRequest;
 import com.eitech1.chartv.response.dto.AuthenticationResponse;
 import com.eitech1.chartv.response.dto.UserDto;
 import com.eitech1.chartv.response.template.Response;
-import com.eitech1.chartv.respository.ResetTokenRepository;
 import com.eitech1.chartv.respository.UserRepository;
 import com.eitech1.chartv.service.AuthService;
 import com.eitech1.chartv.service.MyUserDetailsService;
@@ -58,9 +56,6 @@ public class AuthServiceImpl implements AuthService {
 	private MyUserDetailsService userDetailsService;
 	
 	@Autowired
-	private ResetTokenRepository resetTokenRepository;
-	
-	@Autowired
 	private EntityToDtoMapper entityToDtoMapper;
 	
 	@Autowired
@@ -69,6 +64,8 @@ public class AuthServiceImpl implements AuthService {
 	@Autowired
 	private EmailUtil emailUtil;
 	
+	private static final long OTP_VALID_DURATION= 5 *60 * 1000; //5 minutes
+	
 
 	@Override
 	public ResponseEntity<Response<UserDto>> saveUser(UserRequest userRequest) throws ChartVException {
@@ -76,24 +73,21 @@ public class AuthServiceImpl implements AuthService {
 		try {
 			userValidation.validateUser(userRequest.getUsername());
 			userValidation.validateUserEmail(userRequest.getEmail());
-			
-//			String pass = userRequest.getPassword();
-//			String encpass = passwordEncoder.encode(pass);
-//			userRequest.setPassword(encpass);
-			
-			//dtoToEntityMapper.convertToUser(userRequest);
+
 			 Random r = new Random();
 			    String password = String.format("%06d", r.nextInt(100001));
+			    
+			    emailUtil.sendEmail(
+						userRequest.getEmail(), 
+						"Login Credencials \n", 
+						"Please find your login credencials here \n"+ 
+						"username :"+ userRequest.getUsername() +"\n"+ 
+						"password :"+ password);
 			
 			User user = userRepository.save(dtoToEntityMapper.convertToUser(userRequest,password));
 		UserDto userDTO =	entityToDtoMapper.convertUserDto(user);
 			
-		emailUtil.sendEmail(
-				user.getEmail(), 
-				"Login Credencials \n", 
-				"Please find your login credencials here \n"+ 
-				"username :"+ user.getUsername() +"\n"+ 
-				"password :"+ password);
+		
 		
 			return Response.success(userDTO, HttpStatus.CREATED);
 			
@@ -145,27 +139,23 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	@Transactional
-	public ResponseEntity<Response<ResetToken>> findUser(String username) throws ChartVException {
+	public ResponseEntity<Response<UserDto>> findUser(String username) throws ChartVException {
 		
 		try {
 			userValidation.validateUsername(username);
-			
-			User user = userRepository.findByUsername(username);
-
-	//		resetTokenRepository.deleteByUser(user);  //need to delete
-			
-		
-			 String token=commonValidation.validateToken(generateToken());
+			User fetched = userRepository.findByUsername(username);			
+			String token=generateToken();
 			    
-			ResetToken resetTokenEntity = dtoToEntityMapper.convertToResetToken(user,token );
-			resetTokenRepository.save(resetTokenEntity);
+			User otpUser = dtoToEntityMapper.convertToUserOtp(fetched, token);
+			userRepository.save(otpUser);
+			UserDto user=entityToDtoMapper.convertUserDto(otpUser);
 					
 			emailUtil.sendEmail(
-					user.getEmail(), 
+					fetched.getEmail(), 
 					"Password Reset Token", 
 					"Your Password Reset Token :  "+token);
 			
-			return Response.success(resetTokenEntity, HttpStatus.OK);
+			return Response.success(user, HttpStatus.OK);
 			
 		} catch (ChartVException e) {
 			throw e;
@@ -182,25 +172,33 @@ public class AuthServiceImpl implements AuthService {
 
 			}
 
-			//throw new ChartVException(ResponseMessages.UNEXPECTED_ERROR, e.getCause());
-			throw new ChartVException(e);
+			throw new ChartVException(ResponseMessages.UNEXPECTED_ERROR, e.getCause());
+			//throw new ChartVException(e);
 		
 		}
 
 	}
 
 	@Override
-	public ResponseEntity<Response<UserDto>> resetTokenValidate(String token) throws ChartVException {
+	public ResponseEntity<Response<UserDto>> resetTokenValidate(int userId,String token) throws ChartVException {
 			try {
-			commonValidation.validateResetToken(token);
+			commonValidation.validateResetToken(userId, token);
+			User fetchedUser = userRepository.findByuserid(userId);
 			
-			ResetToken resetToken =	resetTokenRepository.findByToken(token);
-			User user=resetToken.getUser();
-			UserDto userDTO = entityToDtoMapper.convertUserDto(user);
+			long currentTimeMillis = System.currentTimeMillis();
+			long otpRequestedTimeMillis = fetchedUser.getOtpRequestedTime().getTime();
 			
-			resetTokenRepository.delete(resetToken); 		//need to delete
-			resetTokenRepository.deleteById(resetToken.getId()); 		//need to delete
-
+			if(otpRequestedTimeMillis + OTP_VALID_DURATION < currentTimeMillis ) {
+				fetchedUser.setOtpRequestedTime(null);
+				fetchedUser.setToken(null);
+				userRepository.save(fetchedUser);
+				throw new ChartVException(ResponseMessages.OTP_EXP);
+			}
+			
+			UserDto userDTO = entityToDtoMapper.convertUserDto(fetchedUser);
+			fetchedUser.setOtpRequestedTime(null);
+			fetchedUser.setToken(null);
+			userRepository.save(fetchedUser);
 			
 			return Response.success(userDTO, HttpStatus.OK);
 			
@@ -221,6 +219,10 @@ public class AuthServiceImpl implements AuthService {
 			User userReset = dtoToEntityMapper.convertToResetUser(user, resetRequest);
 			userRepository.save(userReset);
 			UserDto userDTO = entityToDtoMapper.convertUserDto(userReset);
+			emailUtil.sendEmail(
+					user.getEmail(),
+					"Updated Password", 
+					"your new password : "+ userReset.getPassword());
 			
 			return Response.success(userDTO,HttpStatus.OK);
 			

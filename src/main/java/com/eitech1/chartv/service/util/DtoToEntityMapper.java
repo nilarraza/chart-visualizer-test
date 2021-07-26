@@ -7,11 +7,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.eitech1.chartv.Entity.DataSet;
-import com.eitech1.chartv.Entity.ResetToken;
 import com.eitech1.chartv.Entity.SheetEx;
 import com.eitech1.chartv.Entity.Tab;
 import com.eitech1.chartv.Entity.User;
 import com.eitech1.chartv.request.dto.ResetPassRequest;
+import com.eitech1.chartv.request.dto.UpdateRequest;
 import com.eitech1.chartv.request.dto.UserRequest;
 import com.eitech1.chartv.respository.SheetMetaRepository;
 
@@ -46,12 +46,12 @@ public class DtoToEntityMapper {
 		
 	}
 	
-	public ResetToken convertToResetToken(User user,String token) {
-		return ResetToken.builder()
-				.token(token)
-				.user(user)
-				.build();
+	
+	public User convertToUserOtp(User user,String token) {
+		user.setToken(token);
+		user.setOtpRequestedTime(new Date());
 		
+		return user;	
 	}
 	
 	public User convertToUser(UserRequest user,String password) {
@@ -77,6 +77,14 @@ public class DtoToEntityMapper {
 				.isActive(true)
 				.build();
 		
+	}
+	
+	public User convertToUpdateUser(UpdateRequest upRequest,User fetchedUser) {
+		fetchedUser.setUsername(upRequest.getUsername());
+		fetchedUser.setEmail(upRequest.getEmail());
+		fetchedUser.setRoles(upRequest.getRole());
+		fetchedUser.setActive(upRequest.isActive());
+		return fetchedUser;
 	}
 	
 

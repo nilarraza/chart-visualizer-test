@@ -1,6 +1,5 @@
 package com.eitech1.chartv.util;
 
-import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +28,9 @@ public class EmailUtilImpl implements EmailUtil {
 			helper.setSubject(subject);
 			helper.setText(body);
 			
-		} catch (MessagingException e) {
+		} catch (Exception e) {
 			throw new ChartVException(ResponseMessages.UNEXPECTED_ERROR, e.getCause());
 		}
-		
 		sender.send(message);
 
 	}

@@ -1,11 +1,11 @@
 package com.eitech1.chartv.Entity;
 
-import javax.persistence.CascadeType;
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,7 +38,10 @@ public class User {
 	@Column(name = "active")
 	private boolean isActive;
 	
-	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-	private ResetToken token;
-
+	@Column(name = "token")
+	private String token;
+	
+	@Column(name = "otpRequestedTime")
+	private Date otpRequestedTime;
+	
 }

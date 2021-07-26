@@ -17,6 +17,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 	List<User> findByRoles(String string);
 	boolean existsByUsername(String username);
 	boolean existsByEmail(String email);
+	boolean existsByUseridAndToken(Integer id,String token);
+	
+	
 	
 	@Query("SELECT u FROM User u WHERE u.isActive=1")
 	List<User> findByActive();

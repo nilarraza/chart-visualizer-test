@@ -1,13 +1,11 @@
 package com.eitech1.chartv.validator;
 
-import java.util.Random;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.eitech1.chartv.exceptions.ChartVDataValidationException;
-import com.eitech1.chartv.respository.ResetTokenRepository;
 import com.eitech1.chartv.respository.SheetMetaRepository;
+import com.eitech1.chartv.respository.UserRepository;
 
 @Component
 public class CommonValidation {
@@ -16,7 +14,7 @@ public class CommonValidation {
 	private SheetMetaRepository sheetMetaRepository;
 	
 	@Autowired
-	private ResetTokenRepository resetTokenRepository;
+	private UserRepository userRepository;
 
 	
 	public void validateSheetMeta(int metaId) throws ChartVDataValidationException   {
@@ -26,21 +24,10 @@ public class CommonValidation {
 		}
 	}
 	
-	public void validateResetToken(String token) throws ChartVDataValidationException   {
-		boolean valid = resetTokenRepository.existsByToken(token);
+	public void validateResetToken(Integer id,String token) throws ChartVDataValidationException   {
+		boolean valid = userRepository.existsByUseridAndToken(id, token);
 		if (!valid) {
-			throw new ChartVDataValidationException("Password Reset Token is Invalid", token);
-		}
-	}
-	
-	public String validateToken(String token) throws ChartVDataValidationException   {
-		boolean valid = resetTokenRepository.existsByToken(token);
-		if (!valid) {
-			return token;
-		}else {
-			 Random r = new Random();
-			    String resetToken = String.format("%06d", r.nextInt(100001));
-			    return resetToken;
+			throw new ChartVDataValidationException("OTP is Invalid", token);
 		}
 	}
 	
